@@ -8,7 +8,7 @@
 int main(int argc, char **argv){
 	 
 	int rc,myrank,nproc,dimension;
-	dimension = 5;
+	dimension = 10;
 	const int root = 0;
 	srand(time(NULL));
 	double* iArray = malloc(dimension*dimension*sizeof(double));
@@ -22,8 +22,13 @@ int main(int argc, char **argv){
  	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   	MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
+  	double* subArray;
   	int line_per = (dimension-2)/nproc;
-  	double* subArray = malloc(dimension*(line_per+3)*sizeof(double));
+  	if(myrank == nproc-1){
+  		subArray = malloc(dimension*((dimension-myrank*line_per))*sizeof(double));
+  	}else{
+  		subArray = malloc(dimension*(line_per+2)*sizeof(double));
+  	}
 
 	if(myrank == root){
 		// printf("main reports %d procs\n", nproc);
@@ -42,7 +47,6 @@ int main(int argc, char **argv){
     		if(i < (nproc-1)){
     			MPI_Send((iArray+(dimension*(i*line_per))),dimension*(line_per+2),MPI_DOUBLE,i,i,MPI_COMM_WORLD);
     		}else{
-    			printf("hahahah\n");
     		 	MPI_Send((iArray+(dimension*i*line_per)),(dimension-i*line_per)*dimension,MPI_DOUBLE,i,i,MPI_COMM_WORLD);	
     		 }
     	}
@@ -69,9 +73,18 @@ int main(int argc, char **argv){
 		printf("next1!!!!!!!!!\n");
 	}
 
-	 if(myrank == 1){
+
+	if(myrank != nproc-1){
 		printf("-------------\n");
-		for (int i = 0; i < line_per+3; i++){
+		for (int i = 0; i < line_per+2; i++){
+			for (int j = 0; j < dimension; j++) { 
+				printf("%f   ",subArray[i*dimension+j]);
+			}
+		printf("\n");
+		 }
+	 }else{
+	 	printf("-------------\n");
+	 	for (int i = 0; i < (dimension-myrank*line_per); i++){
 			for (int j = 0; j < dimension; j++) { 
 				printf("%f   ",subArray[i*dimension+j]);
 			}
