@@ -59,10 +59,10 @@ int main(int argc, char **argv){
   		for (int i = 0; i < dimension*dimension; i++){	
 				iArray[i] = rand()%100;
     	}	
-	    	// if (myrank == 0){
-	    	// 	printf("Initial Array:\n");
-	    	// 	printArray(iArray,dimension);
-	    	// }	
+	    	if (myrank == 0){
+	    		printf("Initial Array:\n");
+	    		printArray(iArray,dimension);
+	    	}	
   	}
 
   	// when the flag = 0, main stop and work done.
@@ -175,8 +175,10 @@ int main(int argc, char **argv){
 			}
 		}
 
-		// printf("The new Array:\n");
-		// printArray(iArray,dimension);
+		if(myrank == 0){
+			printf("The new Array:\n");
+			printArray(iArray,dimension);
+		}
 
 		MPI_Barrier(MPI_COMM_WORLD);
 		MPI_Bcast(&flag,1,MPI_INT,root,MPI_COMM_WORLD);
